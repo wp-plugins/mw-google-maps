@@ -1,4 +1,4 @@
-=== MW IP Denied ===
+=== MW Google Maps ===
 Contributors: Takashi Kitajima
 Tags: GoogleMaps, google, map
 Requires at least: 3.3
