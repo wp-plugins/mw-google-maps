@@ -190,5 +190,3 @@ class MW_Google_Maps {
 
 // オブジェクト化（プラグイン実行）
 $MW_Google_Maps = new MW_Google_Maps();
- オブジェクト化（プラグイン実行）
-$MW_Google_Maps = new MW_Google_Maps();
