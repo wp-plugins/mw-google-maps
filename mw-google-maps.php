@@ -3,13 +3,13 @@
  * Plugin Name: MW Google Maps
  * Plugin URI: http://2inc.org/blog/category/products/wordpress_plugins/mw-google-maps/
  * Description: MW Google Maps adds google maps in your post easy.
- * Version: 1.0.2
+ * Version: 1.0.3
  * Author: Takashi Kitajima
  * Author URI: http://2inc.org
  * Text Domain: mw-google-maps
  * Domain Path: /languages/
  * Created: february 25, 2013
- * Modified: March 6, 2013
+ * Modified: August 24, 2013
  * Modified:
  * License: GPL2
  *
