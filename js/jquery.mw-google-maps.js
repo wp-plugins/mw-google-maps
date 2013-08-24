@@ -2,10 +2,10 @@
  * Name: jquery.mw-google-maps.js
  * Plugin URI: http://2inc.org/blog/category/products/wordpress_plugins/mw-google-maps/
  * Description: Google Maps API v3 操作
- * Version: 1.0
+ * Version: 1.0.1
  * Author: Takashi Kitajima
  * Author URI: http://2inc.org
- * Created: february 25, 2013
+ * Created: August 24, 2013
  * Modified:
  * License: GPL2
  *
@@ -103,7 +103,9 @@
 				var map = new google.maps.Map( gmap.get( 0 ), {
 					center: position,
 					zoom: 13,
-					mapTypeId: google.maps.MapTypeId.ROADMAP
+					mapTypeId: google.maps.MapTypeId.ROADMAP,
+					scrollwheel: false,
+					scaleControl: true
 				} );
 				// マーカー設置
 				if ( data.points.length < 1 ||

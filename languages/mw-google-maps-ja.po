@@ -2,10 +2,10 @@
 # This file is distributed under the same license as the MW Google Maps package.
 msgid ""
 msgstr ""
-"Project-Id-Version: MW Google Maps 1.0.1\n"
+"Project-Id-Version: MW Google Maps 1.0.2\n"
 "Report-Msgid-Bugs-To: http://wordpress.org/tag/mw-google-maps\n"
-"POT-Creation-Date: 2013-03-04 04:05:07+00:00\n"
-"PO-Revision-Date: 2013-03-04 13:08+0900\n"
+"POT-Creation-Date: 2013-03-06 03:53:11+00:00\n"
+"PO-Revision-Date: 2013-03-06 12:54+0900\n"
 "Last-Translator: Takashi Kitajima <inc@2inc.org>\n"
 "Language-Team: Takashi Kitajima <inc@2inc.org>\n"
 "MIME-Version: 1.0\n"
@@ -18,35 +18,35 @@ msgstr ""
 "X-Poedit-KeywordsList: __;_e\n"
 "X-Poedit-SearchPath-0: ..\n"
 
-#: system/mw_google_maps_admin_page.php:65
+#: system/mw_google_maps_admin_page.php:66
 msgid "You cannot edit options."
 msgstr ""
 
-#: system/mw_google_maps_admin_page.php:75
+#: system/mw_google_maps_admin_page.php:76
 msgid "Updated"
 msgstr "更新しました"
 
-#: system/mw_google_maps_admin_page.php:94
+#: system/mw_google_maps_admin_page.php:95
 msgid "Select post types to add google maps settings."
 msgstr "Google Mapの設定を追加する投稿タイプを選択してください。"
 
-#: system/mw_google_maps_admin_page.php:108
+#: system/mw_google_maps_admin_page.php:109
 msgid "update"
 msgstr "更新する"
 
-#: system/mw_google_maps_admin_page.php:223
+#: system/mw_google_maps_admin_page.php:224
 msgid "Address"
 msgstr "住所"
 
-#: system/mw_google_maps_admin_page.php:227
+#: system/mw_google_maps_admin_page.php:228
 msgid "Search"
 msgstr "検索する"
 
-#: system/mw_google_maps_admin_page.php:232
+#: system/mw_google_maps_admin_page.php:233
 msgid "Latitude"
 msgstr "緯度"
 
-#: system/mw_google_maps_admin_page.php:238
+#: system/mw_google_maps_admin_page.php:239
 msgid "Longitude"
 msgstr "経度"
 

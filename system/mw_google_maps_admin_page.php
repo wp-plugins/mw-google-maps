@@ -6,7 +6,8 @@
  * Version: 1.0.1
  * Author: Takashi Kitajima
  * Author URI: http://2inc.org
- * Created: March 4, 2013
+ * Created: february 25, 2013
+ * Modified: March 4, 2013
  * Modified:
  * License: GPL2
  *
