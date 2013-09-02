@@ -3,13 +3,13 @@
  * Plugin Name: MW Google Maps
  * Plugin URI: http://2inc.org/blog/category/products/wordpress_plugins/mw-google-maps/
  * Description: MW Google Maps adds google maps in your post easy.
- * Version: 1.0.4
+ * Version: 1.1.1
  * Author: Takashi Kitajima
  * Author URI: http://2inc.org
  * Text Domain: mw-google-maps
  * Domain Path: /languages/
  * Created: february 25, 2013
- * Modified: August 26, 2013
+ * Modified: September 2, 2013
  * Modified:
  * License: GPL2
  *
@@ -113,12 +113,12 @@ class MW_Google_Maps {
 			return;
 
 		$atts = shortcode_atts( array(
-			'id' => get_the_ID(),
+			'id' => get_the_ID()
 		), $atts );
 
 		return $this->shortcode_mw_google_maps_multi( array(
-			'key' => self::NAME.'-map-'.$atts['id'],
-			'ids' => $atts['id'],
+			'key' => self::NAME . '-map-' . $atts['id'],
+			'ids' => $atts['id']
 		) );
 	}
 
@@ -131,15 +131,17 @@ class MW_Google_Maps {
 		global $wp_query, $post;
 
 		$atts = shortcode_atts( array(
-			'key' => self::NAME.'-map-multi',
+			'key' => self::NAME . '-map-multi',
 			'ids' => '',
+			'use_route' => false
 		), $atts );
-		if ( !empty( $ids ) ) {
+		if ( !empty( $atts['ids'] ) ) {
 			$ids = explode( ',', $atts['ids'] );
 			$_posts = get_posts( array(
 				'post__in'  => $ids,
 				'post_type' => 'any',
 				'posts_per_page' => -1,
+				'orderby' => 'post__in',
 			) );
 		} else {
 			$_posts = $wp_query->posts;
@@ -172,17 +174,24 @@ class MW_Google_Maps {
 				} );
 			";
 		}
+
+		$use_route = '';
+		if ( $atts['use_route'] === 'true' ) {
+			$use_route = 'gmap.mw_google_maps( "useRoute" );';
+		}
+
 		$_ret = sprintf( '
 			<script type="text/javascript">
 			jQuery( function( $ ) {
 				var gmap = $( "#%s" ).mw_google_maps();
+				%s
 				%s
 				gmap.mw_google_maps( "render" );
 			} );
 			</script>
 			<div id="%s" class="%s"></div>
 			',
-			$atts['key'], implode( '', $addMarker ), $atts['key'], self::NAME.'-map'
+			$atts['key'], implode( '', $addMarker ), $use_route, $atts['key'], self::NAME . '-map'
 		);
 		return $_ret;
 	}

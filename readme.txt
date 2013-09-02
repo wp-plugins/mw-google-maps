@@ -1,9 +1,9 @@
 === MW Google Maps ===
 Contributors: inc2734
 Tags: GoogleMaps, google, map
-Requires at least: 3.3
+Requires at least: 3.5
 Tested up to: 3.5
-Stable tag: 1.0.4
+Stable tag: 1.1.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -22,6 +22,13 @@ MW Google Maps adds google maps in your post easy.
 5. Add shortcode '[mw-google-maps]' in your post.
 
 == Changelog ==
+
+= 1.1.1 =
+* Bugfix: [mw-google-maps-multi ids=""]
+* Change: The Posts orderby is 'post__in' if set 'ids' in [mw-google-maps-multi].
+
+= 1.1 =
+* Added : Added mw-google-maps-multi's attribute 'use_route'. ex:[mw-google-maps-multi use_route=true]
 
 = 1.0.4 =
 * Added : Added max-width: none in Google Maps css.
