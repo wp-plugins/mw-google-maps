@@ -3,17 +3,16 @@
  * Plugin Name: MW Google Maps
  * Plugin URI: http://2inc.org/blog/category/products/wordpress_plugins/mw-google-maps/
  * Description: MW Google Maps adds google maps in your post easy.
- * Version: 1.1.1
+ * Version: 1.1.2
  * Author: Takashi Kitajima
  * Author URI: http://2inc.org
  * Text Domain: mw-google-maps
  * Domain Path: /languages/
- * Created: february 25, 2013
- * Modified: September 2, 2013
- * Modified:
+ * Created : february 25, 2013
+ * Modified: January 8, 2014
  * License: GPL2
  *
- * Copyright 2013 Takashi Kitajima (email : inc@2inc.org)
+ * Copyright 2014 Takashi Kitajima (email : inc@2inc.org)
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License, version 2, as
@@ -64,7 +63,7 @@ class MW_Google_Maps {
 	 * アンインストールした時の処理
 	 */
 	public static function uninstall() {
-		delete_post_meta_by_key( '_'.self::NAME );
+		delete_post_meta_by_key( '_' . self::NAME );
 		delete_option( self::NAME );
 	}
 
@@ -92,13 +91,13 @@ class MW_Google_Maps {
 		);
 		wp_register_script(
 			'jquery.mw-google-maps',
-			$url.'js/jquery.mw-google-maps.js',
+			$url . 'js/jquery.mw-google-maps.js',
 			array( 'jquery', 'googlemaps-api' ),
-			'1.0',
+			'1.2.0',
 			true
 		);
 		wp_enqueue_script( 'jquery.mw-google-maps' );
-		wp_register_style( self::DOMAIN, $url.'css/style.css' );
+		wp_register_style( self::DOMAIN, $url . 'css/style.css' );
 		wp_enqueue_style( self::DOMAIN );
 	}
 
@@ -149,7 +148,7 @@ class MW_Google_Maps {
 
 		foreach ( $_posts as $post ) {
 			setup_postdata( $post );
-			$post_meta = get_post_meta( $post->ID, '_'.self::NAME, true );
+			$post_meta = get_post_meta( $post->ID, '_' . self::NAME, true );
 			if ( empty( $this->option['post_types'] ) ||
 				!is_array( $this->option['post_types'] ) ||
 				!in_array( get_post_type(), $this->option['post_types'] ) ||
@@ -158,7 +157,10 @@ class MW_Google_Maps {
 			$points[] = array(
 				'latitude'  => $post_meta['latitude'],
 				'longitude' => $post_meta['longitude'],
-				'title'     => '<a href="'.get_permalink().'">'.get_the_title().'</a>',
+				'title'     => apply_filters(
+					self::NAME . '-window',
+					'<a href="' . get_permalink() . '">' . get_the_title() . '</a>'
+				),
 			);
 		}
 		wp_reset_postdata();
@@ -168,9 +170,9 @@ class MW_Google_Maps {
 		foreach ( $points as $point ) {
 			$addMarker[] = "
 				gmap.mw_google_maps( 'addMarker', {
-					latitude : ".esc_html( $point['latitude'] ).",
-					longitude: ".esc_html( $point['longitude'] ).",
-					title    : '".$point['title']."'
+					latitude : " . esc_html( $point['latitude'] ) . ",
+					longitude: " . esc_html( $point['longitude'] ) . ",
+					title    : '" . $point['title'] . "'
 				} );
 			";
 		}

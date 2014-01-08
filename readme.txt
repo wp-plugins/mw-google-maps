@@ -3,7 +3,7 @@ Contributors: inc2734
 Tags: GoogleMaps, google, map
 Requires at least: 3.5
 Tested up to: 3.5
-Stable tag: 1.1.1
+Stable tag: 1.1.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -22,6 +22,10 @@ MW Google Maps adds google maps in your post easy.
 5. Add shortcode '[mw-google-maps]' in your post.
 
 == Changelog ==
+
+= 1.1.2 =
+* Change: Open only single info wndow .
+* Added : Add mw-google-maps-window filter hook.
 
 = 1.1.1 =
 * Bugfix: [mw-google-maps-multi ids=""]

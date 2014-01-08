@@ -2,11 +2,11 @@
  * Name: jquery.mw-google-maps.js
  * Plugin URI: http://2inc.org/blog/category/products/wordpress_plugins/mw-google-maps/
  * Description: Google Maps API v3 操作
- * Version: 1.1
+ * Version: 1.2.0
  * Author: Takashi Kitajima
  * Author URI: http://2inc.org
- * Created: August 28, 2013
- * Modified:
+ * Created : August 28, 2013
+ * Modified: January 8, 2014
  * License: GPL2
  *
  * Copyright 2013 Takashi Kitajima (email : inc@2inc.org)
@@ -166,6 +166,7 @@
 				var minLng = data.points[0].longitude;
 				var maxLng = data.points[0].longitude;
 
+				var currentInfoWindow = null;
 				$.each( data.points, function( key, val ) {
 					var marker = new google.maps.Marker( {
 						position: new google.maps.LatLng(
@@ -182,7 +183,11 @@
 							content: val.title
 						} );
 						google.maps.event.addListener( marker, 'click', function() {
+							if ( currentInfoWindow ) {
+								currentInfoWindow.close();
+							}
 							infowindow.open( map, marker );
+							currentInfoWindow = infowindow;
 						} );
 					}
 
