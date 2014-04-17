@@ -2,8 +2,8 @@
 Contributors: inc2734
 Tags: GoogleMaps, google, map
 Requires at least: 3.5
-Tested up to: 3.5
-Stable tag: 1.1.2
+Tested up to: 3.9
+Stable tag: 1.2.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -12,6 +12,19 @@ MW Google Maps adds google maps in your post easy.
 == Description ==
 
 MW Google Maps adds google maps in your post easy.
+
+= Shortcode =
+* **[mw-google-maps]**  
+Map of this post has been displayed.
+
+* **[mw-google-maps id="352"]**  
+Map that post_id is 353 is displayed.
+
+* **[mw-google-maps-multi]**  
+Map of this posts has been displayed.
+
+* **[mw-google-maps-multi ids="19,85,330"]**  
+Map that post_id is 19 or 85 or 330 is displayed.
 
 == Installation ==
 
@@ -22,6 +35,9 @@ MW Google Maps adds google maps in your post easy.
 5. Add shortcode '[mw-google-maps]' in your post.
 
 == Changelog ==
+
+= 1.2.0 =
+* Post type that set show_ui has been displayed in settings page.
 
 = 1.1.2 =
 * Change: Open only single info wndow .

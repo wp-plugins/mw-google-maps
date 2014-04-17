@@ -3,13 +3,13 @@
  * Plugin Name: MW Google Maps
  * Plugin URI: http://2inc.org/blog/category/products/wordpress_plugins/mw-google-maps/
  * Description: MW Google Maps adds google maps in your post easy.
- * Version: 1.1.2
+ * Version: 1.2.0
  * Author: Takashi Kitajima
  * Author URI: http://2inc.org
  * Text Domain: mw-google-maps
  * Domain Path: /languages/
- * Created : february 25, 2013
- * Modified: January 8, 2014
+ * Created : February 25, 2013
+ * Modified: April 18, 2014
  * License: GPL2
  *
  * Copyright 2014 Takashi Kitajima (email : inc@2inc.org)
@@ -134,14 +134,27 @@ class MW_Google_Maps {
 			'ids' => '',
 			'use_route' => false
 		), $atts );
+
+		$post_types = get_post_types( array( 'show_ui' => true ) );
+		$post_type_objects = array();
+		foreach ( $post_types as $post_type ) {
+			$post_type_objects[$post_type] = get_post_type_object( $post_type );
+		}
+
 		if ( !empty( $atts['ids'] ) ) {
 			$ids = explode( ',', $atts['ids'] );
-			$_posts = get_posts( array(
+			$option = array(
 				'post__in'  => $ids,
-				'post_type' => 'any',
+				'post_type' => $post_types,
 				'posts_per_page' => -1,
 				'orderby' => 'post__in',
-			) );
+			);
+			if ( is_user_logged_in() ) {
+				$option['post_status'] = array( 'private', 'publish' );
+				$_posts = get_posts( $option );
+			} else {
+				$_posts = get_posts( $option );
+			}
 		} else {
 			$_posts = $wp_query->posts;
 		}
@@ -154,13 +167,18 @@ class MW_Google_Maps {
 				!in_array( get_post_type(), $this->option['post_types'] ) ||
 				empty( $post_meta ) )
 				continue;
+
+			$post_type = $post->post_type;
+			if ( isset( $post_type_objects[$post_type] ) && $post_type_objects[$post_type]->public ) {
+				$title = '<a href="' . get_permalink() . '">' . get_the_title() . '</a>';
+			} else {
+				$title = get_the_title();
+			}
+
 			$points[] = array(
 				'latitude'  => $post_meta['latitude'],
 				'longitude' => $post_meta['longitude'],
-				'title'     => apply_filters(
-					self::NAME . '-window',
-					'<a href="' . get_permalink() . '">' . get_the_title() . '</a>'
-				),
+				'title'     => apply_filters( self::NAME . '-window', $title ),
 			);
 		}
 		wp_reset_postdata();

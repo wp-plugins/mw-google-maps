@@ -3,12 +3,12 @@
  * Name: MW Google Maps Admin Page
  * Plugin URI: http://2inc.org/blog/category/products/wordpress_plugins/mw-google-maps/
  * Description: 管理画面クラス
- * Version: 1.0.1
+ * Version: 1.0.2
  * Author: Takashi Kitajima
  * Author URI: http://2inc.org
  * Created: february 25, 2013
  * Modified: March 4, 2013
- * Modified: January 8, 2014
+ * Modified: April 18, 2014
  * License: GPL2
  *
  * Copyright 2014 Takashi Kitajima (email : inc@2inc.org)
@@ -87,7 +87,7 @@ class MW_Google_Maps_Admin_Page {
 		// データベースから設定を取得
 		$option = get_option( self::NAME );
 		// 投稿タイプを取得
-		$post_types = get_post_types( array( 'public' => true ) );
+		$post_types = get_post_types( array( 'show_ui' => true ) );
 		unset( $post_types['attachment'] );
 		unset( $post_types['links'] );
 		?>
