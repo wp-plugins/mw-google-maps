@@ -3,14 +3,15 @@
  * Name: MW Google Maps Admin Page
  * Plugin URI: http://2inc.org/blog/category/products/wordpress_plugins/mw-google-maps/
  * Description: 管理画面クラス
- * Version: 1.0.1
+ * Version: 1.0.2
  * Author: Takashi Kitajima
  * Author URI: http://2inc.org
- * Created: March 4, 2013
- * Modified:
+ * Created: february 25, 2013
+ * Modified: March 4, 2013
+ * Modified: April 18, 2014
  * License: GPL2
  *
- * Copyright 2013 Takashi Kitajima (email : inc@2inc.org)
+ * Copyright 2014 Takashi Kitajima (email : inc@2inc.org)
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License, version 2, as
@@ -29,12 +30,14 @@ class MW_Google_Maps_Admin_Page {
 
 	const NAME = 'mw-google-maps';
 	const DOMAIN = 'mw-google-maps';
+	private $level;
 	protected $option;
 
 	/**
 	 * __construct
 	 */
 	public function __construct() {
+		$this->level = 'manage_options';
 		add_action( 'admin_menu', array( $this, 'admin_menu' ) );
 		add_action( 'admin_init', array( $this, 'register_setting' ) );
 
@@ -62,7 +65,7 @@ class MW_Google_Maps_Admin_Page {
 	 */
 	public function view() {
 		if ( isset( $_POST['submit'] ) ) {
-			if ( ! current_user_can( 'manage_options' ) ) die( __( 'You cannot edit options.' ) );
+			if ( ! current_user_can( $this->level ) ) die( __( 'You cannot edit options.' ) );
 			$updateFlg = true;
 		}
 		?>
@@ -84,7 +87,7 @@ class MW_Google_Maps_Admin_Page {
 		// データベースから設定を取得
 		$option = get_option( self::NAME );
 		// 投稿タイプを取得
-		$post_types = get_post_types( array( 'public' => true ) );
+		$post_types = get_post_types( array( 'show_ui' => true ) );
 		unset( $post_types['attachment'] );
 		unset( $post_types['links'] );
 		?>
@@ -153,7 +156,7 @@ class MW_Google_Maps_Admin_Page {
 	 * 設定メニューにプラグインのサブメニューを追加する
 	 */
 	public function admin_menu() {
-		add_options_page( 'MW Google Maps', 'MW Google Maps', 'manage_options', __FILE__,  array( $this, 'admin_page' ) );
+		add_options_page( 'MW Google Maps', 'MW Google Maps', $this->level, __FILE__,  array( $this, 'admin_page' ) );
 	}
 
 	/**

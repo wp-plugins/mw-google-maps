@@ -3,16 +3,16 @@
  * Plugin Name: MW Google Maps
  * Plugin URI: http://2inc.org/blog/category/products/wordpress_plugins/mw-google-maps/
  * Description: MW Google Maps adds google maps in your post easy.
- * Version: 1.0.1
+ * Version: 1.2.0
  * Author: Takashi Kitajima
  * Author URI: http://2inc.org
  * Text Domain: mw-google-maps
  * Domain Path: /languages/
- * Created: March 4, 2013
- * Modified:
+ * Created : February 25, 2013
+ * Modified: April 18, 2014
  * License: GPL2
  *
- * Copyright 2013 Takashi Kitajima (email : inc@2inc.org)
+ * Copyright 2014 Takashi Kitajima (email : inc@2inc.org)
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License, version 2, as
@@ -63,7 +63,7 @@ class MW_Google_Maps {
 	 * アンインストールした時の処理
 	 */
 	public static function uninstall() {
-		delete_post_meta_by_key( '_'.self::NAME );
+		delete_post_meta_by_key( '_' . self::NAME );
 		delete_option( self::NAME );
 	}
 
@@ -91,13 +91,13 @@ class MW_Google_Maps {
 		);
 		wp_register_script(
 			'jquery.mw-google-maps',
-			$url.'js/jquery.mw-google-maps.js',
+			$url . 'js/jquery.mw-google-maps.js',
 			array( 'jquery', 'googlemaps-api' ),
-			'1.0',
+			'1.2.0',
 			true
 		);
 		wp_enqueue_script( 'jquery.mw-google-maps' );
-		wp_register_style( self::DOMAIN, $url.'css/style.css' );
+		wp_register_style( self::DOMAIN, $url . 'css/style.css' );
 		wp_enqueue_style( self::DOMAIN );
 	}
 
@@ -112,12 +112,12 @@ class MW_Google_Maps {
 			return;
 
 		$atts = shortcode_atts( array(
-			'id' => get_the_ID(),
+			'id' => get_the_ID()
 		), $atts );
 
 		return $this->shortcode_mw_google_maps_multi( array(
-			'key' => self::NAME.'-map-'.$atts['id'],
-			'ids' => $atts['id'],
+			'key' => self::NAME . '-map-' . $atts['id'],
+			'ids' => $atts['id']
 		) );
 	}
 
@@ -127,41 +127,58 @@ class MW_Google_Maps {
 	 * @return	HTML map
 	 */
 	public function shortcode_mw_google_maps_multi( $atts ) {
-		global $posts, $post;
-		if ( empty( $posts ) )
-			return;
-
-		$ids = array();
-		foreach ( $posts as $_post ) {
-			if ( empty( $_post->ID ) ) continue;
-			$ids[] = $_post->ID;
-		}
+		global $wp_query, $post;
 
 		$atts = shortcode_atts( array(
-			'key' => self::NAME.'-map-multi',
-			'ids' => implode( ',', $ids ),
+			'key' => self::NAME . '-map-multi',
+			'ids' => '',
+			'use_route' => false
 		), $atts );
-		$ids = explode( ',', $atts['ids'] );
-		if ( empty( $ids ) )
-			return;
 
-		$points = array();
-		$_posts = get_posts( array(
-			'post__in'  => $ids,
-			'post_type' => 'any',
-		) );
+		$post_types = get_post_types( array( 'show_ui' => true ) );
+		$post_type_objects = array();
+		foreach ( $post_types as $post_type ) {
+			$post_type_objects[$post_type] = get_post_type_object( $post_type );
+		}
+
+		if ( !empty( $atts['ids'] ) ) {
+			$ids = explode( ',', $atts['ids'] );
+			$option = array(
+				'post__in'  => $ids,
+				'post_type' => $post_types,
+				'posts_per_page' => -1,
+				'orderby' => 'post__in',
+			);
+			if ( is_user_logged_in() ) {
+				$option['post_status'] = array( 'private', 'publish' );
+				$_posts = get_posts( $option );
+			} else {
+				$_posts = get_posts( $option );
+			}
+		} else {
+			$_posts = $wp_query->posts;
+		}
+
 		foreach ( $_posts as $post ) {
 			setup_postdata( $post );
-			$post_meta = get_post_meta( $post->ID, '_'.self::NAME, true );
+			$post_meta = get_post_meta( $post->ID, '_' . self::NAME, true );
 			if ( empty( $this->option['post_types'] ) ||
 				!is_array( $this->option['post_types'] ) ||
 				!in_array( get_post_type(), $this->option['post_types'] ) ||
 				empty( $post_meta ) )
 				continue;
+
+			$post_type = $post->post_type;
+			if ( isset( $post_type_objects[$post_type] ) && $post_type_objects[$post_type]->public ) {
+				$title = '<a href="' . get_permalink() . '">' . get_the_title() . '</a>';
+			} else {
+				$title = get_the_title();
+			}
+
 			$points[] = array(
 				'latitude'  => $post_meta['latitude'],
 				'longitude' => $post_meta['longitude'],
-				'title'     => '<a href="'.get_permalink().'">'.get_the_title().'</a>',
+				'title'     => apply_filters( self::NAME . '-window', $title ),
 			);
 		}
 		wp_reset_postdata();
@@ -171,23 +188,30 @@ class MW_Google_Maps {
 		foreach ( $points as $point ) {
 			$addMarker[] = "
 				gmap.mw_google_maps( 'addMarker', {
-					latitude : ".esc_html( $point['latitude'] ).",
-					longitude: ".esc_html( $point['longitude'] ).",
-					title    : '".$point['title']."'
+					latitude : " . esc_html( $point['latitude'] ) . ",
+					longitude: " . esc_html( $point['longitude'] ) . ",
+					title    : '" . $point['title'] . "'
 				} );
 			";
 		}
+
+		$use_route = '';
+		if ( $atts['use_route'] === 'true' ) {
+			$use_route = 'gmap.mw_google_maps( "useRoute" );';
+		}
+
 		$_ret = sprintf( '
 			<script type="text/javascript">
 			jQuery( function( $ ) {
 				var gmap = $( "#%s" ).mw_google_maps();
+				%s
 				%s
 				gmap.mw_google_maps( "render" );
 			} );
 			</script>
 			<div id="%s" class="%s"></div>
 			',
-			$atts['key'], implode( '', $addMarker ), $atts['key'], self::NAME.'-map'
+			$atts['key'], implode( '', $addMarker ), $use_route, $atts['key'], self::NAME . '-map'
 		);
 		return $_ret;
 	}
