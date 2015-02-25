@@ -1,9 +1,9 @@
 === MW Google Maps ===
 Contributors: inc2734
-Tags: GoogleMaps, google, map
+Tags: GoogleMaps, google, map, route
 Requires at least: 3.5
-Tested up to: 3.9
-Stable tag: 1.2.0
+Tested up to: 4.1.1
+Stable tag: 1.3.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -16,6 +16,9 @@ MW Google Maps adds google maps in your post easy.
 = Shortcode =
 * **[mw-google-maps]**  
 Map of this post has been displayed.
+
+* **[mw-google-maps zoom="18"]**  
+Map that zoom level is 18.
 
 * **[mw-google-maps id="352"]**  
 Map that post_id is 353 is displayed.
@@ -35,6 +38,10 @@ Map that post_id is 19 or 85 or 330 is displayed.
 5. Add shortcode '[mw-google-maps]' in your post.
 
 == Changelog ==
+
+= 1.3.0 =
+* Add zoom in [mw-google-maps].
+* Saved zoom value in admin page are now reflected in the single map.
 
 = 1.2.0 =
 * Post type that set show_ui has been displayed in settings page.

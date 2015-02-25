@@ -3,13 +3,13 @@
  * Plugin Name: MW Google Maps
  * Plugin URI: http://2inc.org/blog/category/products/wordpress_plugins/mw-google-maps/
  * Description: MW Google Maps adds google maps in your post easy.
- * Version: 1.2.0
+ * Version: 1.3.0
  * Author: Takashi Kitajima
  * Author URI: http://2inc.org
  * Text Domain: mw-google-maps
  * Domain Path: /languages/
  * Created : February 25, 2013
- * Modified: April 18, 2014
+ * Modified: February 25, 2015
  * License: GPL2
  *
  * Copyright 2014 Takashi Kitajima (email : inc@2inc.org)
@@ -112,12 +112,22 @@ class MW_Google_Maps {
 			return;
 
 		$atts = shortcode_atts( array(
-			'id' => get_the_ID()
+			'id'   => get_the_ID(),
+			'zoom' => null,
 		), $atts );
 
+		$post_meta = get_post_meta( get_the_ID(), '_' . self::NAME, true );
+		if ( isset( $post_meta['zoom'] ) && is_numeric( $post_meta['zoom'] ) ) {
+			$zoom = $post_meta['zoom'];
+		}
+		if ( is_numeric( $atts['zoom'] ) ) {
+			$zoom = $atts['zoom'];
+		}
+
 		return $this->shortcode_mw_google_maps_multi( array(
-			'key' => self::NAME . '-map-' . $atts['id'],
-			'ids' => $atts['id']
+			'key'  => self::NAME . '-map-' . $atts['id'],
+			'ids'  => $atts['id'],
+			'zoom' => $zoom,
 		) );
 	}
 
@@ -130,9 +140,10 @@ class MW_Google_Maps {
 		global $wp_query, $post;
 
 		$atts = shortcode_atts( array(
-			'key' => self::NAME . '-map-multi',
-			'ids' => '',
-			'use_route' => false
+			'key'       => self::NAME . '-map-multi',
+			'ids'       => '',
+			'use_route' => false,
+			'zoom'      => 13,
 		), $atts );
 
 		$post_types = get_post_types( array( 'show_ui' => true ) );
@@ -144,10 +155,10 @@ class MW_Google_Maps {
 		if ( !empty( $atts['ids'] ) ) {
 			$ids = explode( ',', $atts['ids'] );
 			$option = array(
-				'post__in'  => $ids,
-				'post_type' => $post_types,
+				'post__in'       => $ids,
+				'post_type'      => $post_types,
 				'posts_per_page' => -1,
-				'orderby' => 'post__in',
+				'orderby'        => 'post__in',
 			);
 			if ( is_user_logged_in() ) {
 				$option['post_status'] = array( 'private', 'publish' );
@@ -186,13 +197,17 @@ class MW_Google_Maps {
 			return;
 
 		foreach ( $points as $point ) {
-			$addMarker[] = "
-				gmap.mw_google_maps( 'addMarker', {
-					latitude : " . esc_html( $point['latitude'] ) . ",
-					longitude: " . esc_html( $point['longitude'] ) . ",
-					title    : '" . $point['title'] . "'
+			$addMarker[] = sprintf( '
+				gmap.mw_google_maps( "addMarker", {
+					latitude : %s,
+					longitude: %s,
+					title    : "%s"
 				} );
-			";
+				',
+				esc_js( $point['latitude'] ),
+				esc_js( $point['longitude'] ),
+				esc_js( $point['title'] )
+			);
 		}
 
 		$use_route = '';
@@ -203,7 +218,7 @@ class MW_Google_Maps {
 		$_ret = sprintf( '
 			<script type="text/javascript">
 			jQuery( function( $ ) {
-				var gmap = $( "#%s" ).mw_google_maps();
+				var gmap = $( "#%s" ).mw_google_maps( { zoom: %s } );
 				%s
 				%s
 				gmap.mw_google_maps( "render" );
@@ -211,7 +226,12 @@ class MW_Google_Maps {
 			</script>
 			<div id="%s" class="%s"></div>
 			',
-			$atts['key'], implode( '', $addMarker ), $use_route, $atts['key'], self::NAME . '-map'
+			esc_js( $atts['key'] ),
+			esc_js( $atts['zoom'] ),
+			implode( '', $addMarker ),
+			$use_route,
+			esc_js( $atts['key'] ),
+			esc_js( self::NAME . '-map' )
 		);
 		return $_ret;
 	}

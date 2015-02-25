@@ -2,11 +2,11 @@
  * Name: jquery.mw-google-maps.js
  * Plugin URI: http://2inc.org/blog/category/products/wordpress_plugins/mw-google-maps/
  * Description: Google Maps API v3 操作
- * Version: 1.2.0
+ * Version: 1.2.1
  * Author: Takashi Kitajima
  * Author URI: http://2inc.org
  * Created : August 28, 2013
- * Modified: January 8, 2014
+ * Modified: February 25, 2015
  * License: GPL2
  *
  * Copyright 2013 Takashi Kitajima (email : inc@2inc.org)
@@ -54,6 +54,7 @@
 		 * 初期化
 		 */
 		init   : function( params ) {
+			console.log( params );
 			return this.each( function() {
 				var data = $( this ).data( plugname );
 				if ( !data ) {
@@ -105,7 +106,7 @@
 				// マップ表示
 				var map = new google.maps.Map( gmap.get( 0 ), {
 					center: position,
-					zoom: 13,
+					zoom: data.config.zoom,
 					mapTypeId: google.maps.MapTypeId.ROADMAP,
 					scrollwheel: false,
 					scaleControl: true
@@ -256,10 +257,12 @@
 			 typeof( data.geocode.address ) !== 'undefined' &&
 			 typeof( data.geocode.latitude ) !== 'undefined' &&
 			 typeof( data.geocode.longitude ) !== 'undefined' &&
+			 typeof( data.geocode.zoom ) !== 'undefined' &&
 			 data.geocode.btn.length &&
 			 data.geocode.address.length &&
 			 data.geocode.latitude.length &&
 			 data.geocode.longitude.length &&
+			 data.geocode.zoom.length &&
 			 data.points.length == 1 )
 			)
 			return true;
@@ -291,6 +294,11 @@
 			map.setCenter( latlng );
 			data.geocode.address.val( '' );
 			setInputValueLatLng( event.latLng.lat(), event.latLng.lng() );
+		} );
+
+		google.maps.event.addListener( map, 'zoom_changed', function() {
+			var zoom = map.getZoom();
+			data.geocode.zoom.val( zoom );
 		} );
 
 		function setInputValueLatLng( lat, lng ) {
