@@ -54,7 +54,6 @@
 		 * 初期化
 		 */
 		init   : function( params ) {
-			console.log( params );
 			return this.each( function() {
 				var data = $( this ).data( plugname );
 				if ( !data ) {
@@ -144,7 +143,6 @@
 					// ルート検索を行う
 					var directionsService = new google.maps.DirectionsService();
 					directionsService.route( request, function( result, status ) {
-						//console.log( google.maps.DirectionsStatus );
 						if ( status == google.maps.DirectionsStatus.OK ) {
 							directionsRenderer.setDirections( result );
 							directionsRenderer.setOptions( {

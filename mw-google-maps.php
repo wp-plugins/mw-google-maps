@@ -3,13 +3,13 @@
  * Plugin Name: MW Google Maps
  * Plugin URI: http://2inc.org/blog/category/products/wordpress_plugins/mw-google-maps/
  * Description: MW Google Maps adds google maps in your post easy.
- * Version: 1.3.0
+ * Version: 1.3.1
  * Author: Takashi Kitajima
  * Author URI: http://2inc.org
  * Text Domain: mw-google-maps
  * Domain Path: /languages/
  * Created : February 25, 2013
- * Modified: February 25, 2015
+ * Modified: Marcg 2, 2015
  * License: GPL2
  *
  * Copyright 2014 Takashi Kitajima (email : inc@2inc.org)
@@ -113,7 +113,7 @@ class MW_Google_Maps {
 
 		$atts = shortcode_atts( array(
 			'id'   => get_the_ID(),
-			'zoom' => null,
+			'zoom' => 13,
 		), $atts );
 
 		$post_meta = get_post_meta( get_the_ID(), '_' . self::NAME, true );
@@ -181,9 +181,9 @@ class MW_Google_Maps {
 
 			$post_type = $post->post_type;
 			if ( isset( $post_type_objects[$post_type] ) && $post_type_objects[$post_type]->public ) {
-				$title = '<a href="' . get_permalink() . '">' . get_the_title() . '</a>';
+				$title = '<a href="' . get_permalink() . '">' . esc_js( get_the_title() ) . '</a>';
 			} else {
-				$title = get_the_title();
+				$title = esc_js( get_the_title() );
 			}
 
 			$points[] = array(
@@ -201,12 +201,12 @@ class MW_Google_Maps {
 				gmap.mw_google_maps( "addMarker", {
 					latitude : %s,
 					longitude: %s,
-					title    : "%s"
+					title    : \'%s\'
 				} );
 				',
 				esc_js( $point['latitude'] ),
 				esc_js( $point['longitude'] ),
-				esc_js( $point['title'] )
+				$point['title']
 			);
 		}
 
