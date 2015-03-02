@@ -2,11 +2,11 @@
  * Name: jquery.mw-google-maps.js
  * Plugin URI: http://2inc.org/blog/category/products/wordpress_plugins/mw-google-maps/
  * Description: Google Maps API v3 操作
- * Version: 1.0
+ * Version: 1.2.1
  * Author: Takashi Kitajima
  * Author URI: http://2inc.org
- * Created: february 25, 2013
- * Modified:
+ * Created : August 28, 2013
+ * Modified: February 25, 2015
  * License: GPL2
  *
  * Copyright 2013 Takashi Kitajima (email : inc@2inc.org)
@@ -46,6 +46,7 @@
 ;( function( $ ) {
 
 	var plugname = 'mw_google_maps';
+	var useRoute = false;
 
 	var methods = {
 		/**
@@ -69,6 +70,7 @@
 				}
 			} );
 		},
+
 		/**
 		 * addMarker
 		 * マーカーの追加
@@ -85,6 +87,7 @@
 				data.points.push( $.extend( defaults, params ) );
 			} );
 		},
+
 		/**
 		 * render
 		 * レンダリング
@@ -102,8 +105,10 @@
 				// マップ表示
 				var map = new google.maps.Map( gmap.get( 0 ), {
 					center: position,
-					zoom: 13,
-					mapTypeId: google.maps.MapTypeId.ROADMAP
+					zoom: data.config.zoom,
+					mapTypeId: google.maps.MapTypeId.ROADMAP,
+					scrollwheel: false,
+					scaleControl: true
 				} );
 				// マーカー設置
 				if ( data.points.length < 1 ||
@@ -111,11 +116,56 @@
 					 typeof( data.points[0].longitude ) == 'undefined' )
 					return true; // = jQuery's continue.
 
+				if ( useRoute === true ) {
+					// ルートを表示するマップを設定
+					var directionsRenderer = new google.maps.DirectionsRenderer();
+					directionsRenderer.setMap( map );
+
+					// 経由地点を設定（無料版は最大8箇所）
+					var wayPoints = [];
+					$.each( data.points, function( key, val ) {
+						wayPoints.push( {
+							location: new google.maps.LatLng(
+								val.latitude,
+								val.longitude
+							)
+						} );
+					} );
+
+					// 開始地点と終了地点、ルーティングの種類の設定
+					var request = {
+						origin: wayPoints[0].location,
+						destination: wayPoints.pop().location,
+						travelMode: google.maps.DirectionsTravelMode.DRIVING, // or BICYCLING, TRANSIT, WALKING
+						waypoints: wayPoints
+					};
+
+					// ルート検索を行う
+					var directionsService = new google.maps.DirectionsService();
+					directionsService.route( request, function( result, status ) {
+						if ( status == google.maps.DirectionsStatus.OK ) {
+							directionsRenderer.setDirections( result );
+							directionsRenderer.setOptions( {
+								suppressMarkers: true
+							} );
+						}
+					} );
+				}
+
+				// アイコン
+				var getIcon = function( key ) {
+					if ( useRoute === true ) {
+						return 'http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=' + ( key + 1 ) + '|F96757|000000';
+					}
+					return '';
+				}
+
 				var minLat = data.points[0].latitude;
 				var maxLat = data.points[0].latitude;
 				var minLng = data.points[0].longitude;
 				var maxLng = data.points[0].longitude;
 
+				var currentInfoWindow = null;
 				$.each( data.points, function( key, val ) {
 					var marker = new google.maps.Marker( {
 						position: new google.maps.LatLng(
@@ -123,7 +173,8 @@
 							val.longitude
 						),
 						draggable: val.draggable,
-						map: map
+						map: map,
+						icon: getIcon( key )
 					} );
 
 					if ( typeof( val.title != 'undefined' ) ) {
@@ -131,7 +182,11 @@
 							content: val.title
 						} );
 						google.maps.event.addListener( marker, 'click', function() {
+							if ( currentInfoWindow ) {
+								currentInfoWindow.close();
+							}
 							infowindow.open( map, marker );
+							currentInfoWindow = infowindow;
 						} );
 					}
 
@@ -164,6 +219,7 @@
 
 			} );
 		},
+
 		/**
 		 * geocode
 		 * geocode用のテキストフィールド等を定義
@@ -182,6 +238,14 @@
 				}
 				data.geocode = $.extend( defaults, params );
 			})
+		},
+
+		/**
+		 * useRoute
+		 * ルートサービスを使用する
+		 */
+		useRoute: function() {
+			useRoute = true;
 		}
 	};
 
@@ -191,10 +255,12 @@
 			 typeof( data.geocode.address ) !== 'undefined' &&
 			 typeof( data.geocode.latitude ) !== 'undefined' &&
 			 typeof( data.geocode.longitude ) !== 'undefined' &&
+			 typeof( data.geocode.zoom ) !== 'undefined' &&
 			 data.geocode.btn.length &&
 			 data.geocode.address.length &&
 			 data.geocode.latitude.length &&
 			 data.geocode.longitude.length &&
+			 data.geocode.zoom.length &&
 			 data.points.length == 1 )
 			)
 			return true;
@@ -226,6 +292,11 @@
 			map.setCenter( latlng );
 			data.geocode.address.val( '' );
 			setInputValueLatLng( event.latLng.lat(), event.latLng.lng() );
+		} );
+
+		google.maps.event.addListener( map, 'zoom_changed', function() {
+			var zoom = map.getZoom();
+			data.geocode.zoom.val( zoom );
 		} );
 
 		function setInputValueLatLng( lat, lng ) {
